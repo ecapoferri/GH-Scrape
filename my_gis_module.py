@@ -17,10 +17,6 @@ from useful_func import\
     input_y_otherfalse,\
     jsonextr
 
-from my_pandas_module import\
-    drop_unnamed,\
-    dictcol_expander
-
 
 # named tuple for use in assigning a name 'tag' to a point if within a polygon
 PgsTagPair = namedtuple('PgsTagPair', ('polyg', 'tag'))

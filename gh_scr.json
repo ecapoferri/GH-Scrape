@@ -1,6 +1,6 @@
 {
     "output_filenames": {
-        "scrape_itteration": "09",
+        "scrape_iteration": "09",
         "log_ext": ".log",
         "table_ext": ".csv",
         "menu_scr": "gh_menu_scr.",

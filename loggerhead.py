@@ -6,7 +6,7 @@ used to set up common logging for scripts and modules in this proect
 
 debugfpath = 'testlogout.log'
 
-fmt = "%(asctime)s\t%(name)s\t[%(module)s.%(funcName)s] >>\n\t%(levelname)s: %(message)s"
+fmt = "%(asctime)s >> %(name)s [%(module)s.%(funcName)s] >>\n\t%(levelname)s: %(message)s"
 datefmt = '%m.%d-%H:%M:%S'
 formatter = logging.Formatter(fmt=fmt, datefmt=datefmt)
 

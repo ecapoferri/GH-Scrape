@@ -28,7 +28,7 @@ else:
 
 debugfpath = \
     f"{paths['out_dir_main']}" +\
-    f"gh_scr_STORE-DEBUG-{paths['scrape_itteration']}" +\
+    f"gh_scr_STORE-DEBUG-{paths['scrape_iteration']}" +\
     f"{paths['log_ext']}"
 
 # reset refile as proper bool
@@ -48,7 +48,8 @@ log_config(path=debugfpath, to_reset=re_file)
 # set up main logger
 logger = logging.getLogger()
 # adds stream handler, info level
-logger.addHandler(std_hdlr)
+logger = add_logger('') # adds stream handler, info level
+# announce oneself
 logger.info(__file__)
 
 
@@ -58,7 +59,6 @@ points_list_src = configs['pts_src_path']
 
 def main():
     # prefix for output messages
-    fn_logger = add_logger(main.__name__, __name__)
     try:
         # gets series of points from calculated point grid
         coord_ser = gpd.read_file(points_list_src)['geometry'].apply(
@@ -69,7 +69,7 @@ def main():
         # 1,0 to switch lat, lng
         srch_coords = [(i[1], i[0]) for i in coord_ser]
         num_of_pts = len(srch_coords)
-        fn_logger.info(f"\tSearching {num_of_pts} points")
+        logger.info(f"\tSearching {num_of_pts} points")
 
         # initialize chromedriver
         thisdriver = wdriver_start(True)
@@ -87,10 +87,13 @@ def main():
 
 
     except KeyboardInterrupt:
-        fn_logger.error(
+        logger.error(
             f"KeyboardInterrupt detected, bye-bye...")
     except Exception:
-        fn_logger.error(f"An exceptionn occurred...")
+        logger.error(f"An exceptionn occurred...")
     finally:
         st_res_df.to_csv(st_list_out_path)
-        fn_logger.info(f"EXPORTED - {st_list_out_path}")
+        logger.info(f"EXPORTED - {st_list_out_path}")
+
+if __name__ == '__main__':
+    main()
