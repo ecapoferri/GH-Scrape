@@ -8,5 +8,4 @@ xvfb-run\
     pythonsh\
         ./gh_scr_menuscrapenscroll.py $1 1\
             1>> gh_scr/gh_scr_LOG-$2.log\
-            2>> gh_scr/gh_scr_LOG-$2.log\
-&
+            2>> gh_scr/gh_scr_LOG-$2.log
