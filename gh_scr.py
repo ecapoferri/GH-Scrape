@@ -13,12 +13,11 @@ import pandas as pd
 from pandas import DataFrame as Df, Series as Ser
 import logging
 from useful_func import ts, jsonextr
-from loggerhead import std_hdlr, add_logger, log_config
+from loggerhead import add_logger
 
 # start logger as defined in loggerhead, debug to file,
-# add common streamhandler, info level to console
-logger = logging.getLogger(__name__)
-logger.addHandler(std_hdlr)
+# adds a common streamhandler, info level to console
+logger = add_logger(__name__)
 
 config_args = jsonextr('gh_scr.json')
 
@@ -121,7 +120,6 @@ def load_html(url: str, wdriver: webdriver.Chrome,
     Raises:
         KeyboardInterrupt
     """
-    fn_logger = add_logger(load_html.__name__, __name__)
 
     try:
         # get html from page
@@ -130,7 +128,7 @@ def load_html(url: str, wdriver: webdriver.Chrome,
             sleep(wait_time)
 
         wdriver.execute_script("document.body.style.zoom='25%'")
-        fn_logger.debug(f"{url}")
+        logger.debug(f"{url}")
 
         return WebDriverWait(
             wdriver, timeout=wait_time, poll_frequency=1
@@ -139,7 +137,7 @@ def load_html(url: str, wdriver: webdriver.Chrome,
     except KeyboardInterrupt:
         raise KeyboardInterrupt(" gh_scr.load_html: KeyboardInterrupt detected...")
     except Exception:
-        fn_logger.error(f"Problem with webdriver wait on {url}")
+        logger.error(f"Problem with webdriver wait on {url}")
 
 
 
@@ -166,7 +164,6 @@ def gh_store_scrape(
     Returns:
         Df: _description_
     """
-    fn_logger = add_logger(gh_store_scrape.__name__, __name__)
 
     # initialize list of html strings
     page_htmls = []
@@ -187,7 +184,7 @@ def gh_store_scrape(
 
             # construct initial url
             url = gh_srch_url(url_root, coords[0], coords[1])
-            fn_logger.debug(f"\turl: {url}")
+            logger.debug(f"\turl: {url}")
 
             html_str = load_html(url=url, wdriver=wdriver, wait_time=wait_time_pg1)
 
@@ -202,13 +199,13 @@ def gh_store_scrape(
             # add reults info to logging output
             if pgs:
                 log_str += f"\tPgs of Results: {str(pgs)}"
-                fn_logger.info(log_str)
+                logger.info(log_str)
                 pg_status += f"\t{ts()}: Pg 1..OK; "
                 del log_str
             else:
-                fn_logger.info(log_str)
+                logger.info(log_str)
                 del log_str
-                fn_logger.error(f"Did not get total results for {coords}")
+                logger.error(f"Did not get total results for {coords}")
 
             # loop through remaining pages and add strings of html to the list, start with second page
             for pg in range(2, pgs+1, 1):
@@ -221,12 +218,12 @@ def gh_store_scrape(
                     pg_status +=  f"{ts()}: Pg {pg}..OK; "
                     
                 except Exception:
-                    fn_logger.error(f"\tThere was an issue with page {pg} for {coords}")
+                    logger.error(f"\tThere was an issue with page {pg} for {coords}")
 
-            fn_logger.info(pg_status)
+            logger.info(pg_status)
 
         except Exception:
-            fn_logger.error(f"There was a problem getting search results for {coords}, see above?")
+            logger.error(f"There was a problem getting search results for {coords}, see above?")
 
         try:
             # bs list of all search result store parent elements by class selector
@@ -250,9 +247,9 @@ def gh_store_scrape(
                         # append results data to indiv. row each time
                         st_sers.append(res_ser)
                     except Exception:
-                        fn_logger.error(f"gh_scr.gh_store_scrape, search results element loop: Store info not found in an element from {coords}")
+                        logger.error(f"gh_scr.gh_store_scrape, search results element loop: Store info not found in an element from {coords}")
         except Exception:
-            fn_logger.error(f"gh_scr.gh_store_scrape: Exception in list of results elements or extraction of data from {coords}\n{url}.")
+            logger.error(f"gh_scr.gh_store_scrape: Exception in list of results elements or extraction of data from {coords}\n{url}.")
 
     except KeyboardInterrupt:
         raise KeyboardInterrupt(
@@ -262,8 +259,8 @@ def gh_store_scrape(
         if len(st_sers) !=0 :
             pass
         else:
-            fn_logger.error(f"gh_scr.gh_store_scrape: No Results returnedfor {coords}")
-            fn_logger.debug(f"\tBad search results scrape for {coords}\n\turl: {url}")
+            logger.error(f"gh_scr.gh_store_scrape: No Results returnedfor {coords}")
+            logger.debug(f"\tBad search results scrape for {coords}\n\turl: {url}")
         
         # dataframes list of series of store results to return
         return Df(st_sers)
@@ -293,9 +290,9 @@ def wdriver_start(headless: bool, ex_path: str = wd_path) -> webdriver.Chrome:
     return webdriver.Chrome(executable_path=ex_path, options=options)
     # except Exception:
     #     err_msg = f"Was not able to init webdriver in gh_scr.wdriver. See debug for arg dump."
-    #     fn_logger.error(err_msg)
+    #     logger.error(err_msg)
     #     for var in ("headless", headless), ("ex_path", ex_path):
-    #         fn_logger.debug(f"arg: {var[0]} = {var[1]}")
+    #         logger.debug(f"arg: {var[0]} = {var[1]}")
     #     raise Exception(err_msg)
 
 def scroll_home(wdr: webdriver.Chrome):
@@ -310,10 +307,9 @@ def scroll_end(wdr: webdriver.Chrome):
 
 def wdriver_quit(wdrv: webdriver.Chrome) -> None:
     """Citizen, give me a selenium.webdriver object. I will quit it for you."""
-    fn_logger = add_logger(wdriver_quit.__name__, __name__)
 
     wdrv.quit()
-    fn_logger.info(f"webdriver, session id: {wdrv.session_id} has quit! Have a nice day!")
+    logger.info(f"webdriver, session id: {wdrv.session_id} has quit! Have a nice day!")
 
 
 # menu default values:
@@ -352,7 +348,6 @@ def ser_item_details(
     cols: tuple,
 ) -> Ser:
     """"get item details from a menu parent page element"""
-    fn_logger = add_logger(ser_item_details.__name__, __name__)
 
     debug_str = ''
     # menu item id
@@ -373,7 +368,7 @@ def ser_item_details(
     i_de = i_el.find(attrs=itm_de_avd).string
     debug_str += f"item info: {i_de}; "
 
-    fn_logger.debug(f"\t{debug_str}")
+    logger.debug(f"\t{debug_str}")
     del debug_str
 
     # id, name, price, description
@@ -420,7 +415,6 @@ def rest_menu_scrape(
             can be concatenated to make one large master
             
     """
-    fn_logger = add_logger(rest_menu_scrape.__name__, __name__)
 
     try:
         html_str = load_html(url=url, wdriver=wdriver, wait_time=wait_time)
@@ -428,7 +422,7 @@ def rest_menu_scrape(
         # bs list of all menu item parent elements
         menu_els = Bs(html_str, 'html.parser').find_all(attrs=itm_avd)
         del html_str
-        fn_logger.debug(f"Menu elements: {len(menu_els)}")
+        logger.debug(f"Menu elements: {len(menu_els)}")
 
         # loop through each element in menu_els
         ser_list = []
@@ -447,7 +441,7 @@ def rest_menu_scrape(
                 ser_list.append(i_ser)
 
             except Exception:
-                fn_logger.error(
+                logger.error(
                     f"Somethind went wrong on menu element {idx} from {url}")
 
         # results to dataframe
@@ -457,7 +451,7 @@ def rest_menu_scrape(
 
         return df
     except Exception:
-        fn_logger.error(
+        logger.error(
             f"There was an an exception in rest_menu_scrape with {url}")
 
 
@@ -497,7 +491,6 @@ def rest_menu_scrape_n_scroll(
             can be concatenated to make one large master
             
     """
-    fn_logger = add_logger(rest_menu_scrape_n_scroll.__name__, __name__)
 
     try:
         html_str = load_html(
@@ -558,7 +551,7 @@ def rest_menu_scrape_n_scroll(
             last_a = a
 
 
-        fn_logger.debug(f"Menu elements: {len(menu_els)}")
+        logger.debug(f"Menu elements: {len(menu_els)}")
 
         # loop through each element in menu_els
         ser_list=[]
@@ -575,7 +568,7 @@ def rest_menu_scrape_n_scroll(
                 ser_list.append(i_ser)
 
             except Exception:
-                fn_logger.error(f"Somethind went wrong on menu element {idx} from {url}")
+                logger.error(f"Somethind went wrong on menu element {idx} from {url}")
 
         # results to dataframe
         df = Df(ser_list).drop_duplicates(subset=idcol).reset_index(drop=True)
@@ -588,7 +581,7 @@ def rest_menu_scrape_n_scroll(
         raise KeyboardInterrupt(
             " gh_scr.rest_menu_scrape_n_scroll: KeyboardInterrupt detected...")
     except Exception:
-        fn_logger.error(f"There was an an exception in rest_menu_scrape with {url}")
+        logger.error(f"There was an an exception in rest_menu_scrape with {url}")
 
 
 
@@ -643,7 +636,6 @@ def rest_details_scrape(
     address_avd: dict=det_address_avd,
     cols: tuple = det_cols
 ) -> Ser:
-    fn_logger = add_logger(rest_details_scrape.__name__, __name__)
 
     try:
         # get page and expand full schedule
@@ -660,15 +652,15 @@ def rest_details_scrape(
         # exp_schd_toclick.click()
 
         html_str = load_html(url=url, wdriver=wdriver, wait_time=wait_time)
-        fn_logger.debug(f"HTML extracted: {len(html_str)}")
+        logger.debug(f"HTML extracted: {len(html_str)}")
 
         # get soup of 
         det_el: Tag = Bs(html_str, 'html.parser').find('span', attrs=det_main_avd)
         if not det_el:
-            fn_logger.error(f"About tag not found for {url}")
+            logger.error(f"About tag not found for {url}")
             return
         del html_str
-        fn_logger.debug(f"About Tag Descendents: {det_el}")
+        logger.debug(f"About Tag Descendents: {det_el}")
 
 
         # # get schedule strings
@@ -681,35 +673,35 @@ def rest_details_scrape(
             cuis = det_el.find('div', attrs=cuis_avd).text.split(', ')
         except Exception:
             cuis = pd.NA
-        fn_logger.debug(f"cuis: {cuis}")
+        logger.debug(f"cuis: {cuis}")
         name = store_name
-        fn_logger.debug(f"name: {name}")
+        logger.debug(f"name: {name}")
         try:
             phone = det_el.find('button', attrs=phone_avd).attrs[phone_a]
         except Exception:
             phone = pd.NA
-        fn_logger.debug(f"phone: {phone}")
+        logger.debug(f"phone: {phone}")
         try:
             addr = det_el.find(attrs=address_avd).text
         except Exception:
             addr = pd.NA
-        fn_logger.debug(f"addr: {addr}")
+        logger.debug(f"addr: {addr}")
         # get lat/lng and google maps link from parsed map_el style attribute 
         # ===================================================================
         map_el: Tag = det_el.find(attrs=map_el_avd)
         
         # get google maps link
-        fn_logger.debug(f"map_el.attrs: {map_el.attrs}")
+        logger.debug(f"map_el.attrs: {map_el.attrs}")
         try:
             gmaplnk = map_el.attrs['href']
         except Exception:
             gmaplnk = pd.NA
-        fn_logger.debug(f"gmaplnk: {gmaplnk}")
+        logger.debug(f"gmaplnk: {gmaplnk}")
         try:
             map_style = map_el.find('span').attrs['style']
         except Exception:
             map_style = pd.NA
-        fn_logger.debug(f"map_style: {map_style}")
+        logger.debug(f"map_style: {map_style}")
         # parse map style attr to get lat/lng:
         #   split at parameter= right before the value, work on last element/second half
         #   split all param=args off, keep first element which is now just a string of <lat,lng>
@@ -727,8 +719,8 @@ def rest_details_scrape(
             lng = lat_lng[1]
         except Exception:
             lat, lng = pd.NA, pd.NA
-        fn_logger.debug(f"lat: {lat}")
-        fn_logger.debug(f"lng: {lng}")
+        logger.debug(f"lat: {lat}")
+        logger.debug(f"lng: {lng}")
         # ==============
 
         # schedule, 'cusines', phone number, lat, lng, google map link, address, grubhub id
@@ -738,7 +730,7 @@ def rest_details_scrape(
         raise KeyboardInterrupt(
             f" KeyboardIterrupt detected...{url}")
     except Exception:
-        fn_logger.error(
+        logger.error(
             f" There was an an exception with {url}")
 
 
@@ -758,10 +750,6 @@ def test_det_scrape(url: str=test_url, store_id: int=test_store_id):
     except:
         logging.error("Oops")
 
-
-def main():
-    pass
-
 # run to test menu scrape
 if __name__ == '__main__':
-    main()
+    pass
