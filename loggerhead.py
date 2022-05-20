@@ -20,22 +20,23 @@ def add_logger(lggr_name: str) -> logging.Logger:
     """
     lggr = logging.getLogger(f"{lggr_name}")
     lggr.addHandler(std_hdlr)
+    lggr.info(f"Starting logger: {lggr_name}")
     return lggr
 
 # debug_hdlr = logging.FileHandler(debugfn)
 
 def log_config(path: str=debugfpath, to_reset: bool=True):
-    try:
-        if to_reset:
-            with open(debugfpath, 'w') as f:
-                f.write('')
+    if to_reset:
+        with open(debugfpath, 'w') as f:
+            f.write('')
 
-        logging.basicConfig(
-            filename=path,
-            filemode='a',
-            format=fmt,
-            datefmt=datefmt,
-            level=logging.DEBUG,
-            force=True
-        )
-    finally: return None
+    logging.basicConfig(
+        filename=path,
+        filemode='a',
+        format=fmt,
+        datefmt=datefmt,
+        level=logging.DEBUG,
+        force=True
+    )
+    logging.info(f"Starting this log: {path}")
+    return

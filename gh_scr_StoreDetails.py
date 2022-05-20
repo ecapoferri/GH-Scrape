@@ -1,8 +1,8 @@
 from gh_scr import wdriver_start, wdriver_quit, rest_details_scrape
 from gh_scr_headers import url_root, prv_store_list_repos, det_out_path, paths, scrape_iteration
-from useful_func import timedelta_float_2place, input_y_no_loopother
+from useful_func import timedelta_float_2place, input_y_no_loopother, t_sec
 import logging
-from loggerhead import add_logger, std_hdlr, log_config
+from loggerhead import add_logger, log_config
 from datetime import datetime
 import pandas as pd
 from pandas import DataFrame as Df
@@ -63,18 +63,24 @@ def main():
     # initialize empty dataframe for full list of menu items
     rest_det_list = []
 
+    for_logger = add_logger(f"{__name__}.for-loop")
     for i, store in enumerate(st_res_df[pickup:].itertuples()):
-        loop_id: str = f"{i}/{store.Index}|{store.name}|{store.id}"
+        loop_id: str = f"{i}:{store.Index}|{store.name}|{store.id}"
         logging.info(f"\tStore list idx: {loop_id}")
+
+        # start time in sec, initialize finish time incase of error
+        i_start = t_sec()
+        i_finish = i_start
         try:
-            i_start = datetime.now()
             # try:
 
             url = f"{url_root}{store.url_path}"
 
+            # use fn in core module to scrape details from store page on gh
             this_ser = rest_details_scrape(url, store.id, store.name, thisdriver)
 
-            i_finish = datetime.now()
+            # set finisht time in sec
+            i_finish = t_sec()
         except Exception:
             logger.error(f"There was an exception while scraping")
             continue
@@ -91,7 +97,7 @@ def main():
             logger.error(f"\tReusults not stored for {loop_id}")
 
         try:
-            completed = i - pickup + 1
+            completed = store.Index - pickup + 1
             remaining = list_len - completed
             avg_retrieve = float(elapsed / completed)
             t_remain = remaining * avg_retrieve

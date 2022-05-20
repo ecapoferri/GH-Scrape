@@ -7,18 +7,18 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup as Bs
 from bs4.element import Tag
-from my_gis_module import query_url
 from time import sleep
 import pandas as pd
 from pandas import DataFrame as Df, Series as Ser
 import logging
-from useful_func import ts, jsonextr
+from useful_func import ts, jsonextr, query_url
 from loggerhead import add_logger
 
 # start logger as defined in loggerhead, debug to file,
 # adds a common streamhandler, info level to console
 logger = add_logger(__name__)
 
+# TODO change json to .env and use dotenv
 config_args = jsonextr('gh_scr.json')
 
 

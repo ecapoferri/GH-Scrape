@@ -1,39 +1,64 @@
 {
     "output_filenames": {
-        "scrape_iteration": "10",
+        "scrape_itteration": "07",
         "log_ext": ".log",
         "table_ext": ".csv",
         "menu_scr": "gh_menu_scr.",
         "det_scr": "gh_details_scr.",
         "menu_scr_collection": "menu_cache.",
         "store_scr": "gh_rest_scr.",
-        "out_dir_main": "OUTPUT/",
-        "out_dir_collection_sub": "-menu_cache/"
+        "out_dir_main": "gh_scr/",
+        "out_dir_collection_sub": ".menu_cache/"
     },
-
     "menu_scr_attrs": {
         "button_txt": "Dismiss",
-        
-        "parent_avd": {"data-testid": "restaurant-menu-item"},
-        "name_avd": {"data-testid": "menu-item-name-container"},
-        "price_avd": {"data-testid": "menu-item-price"},
-        "descr_avd": {"data-testid": "description"},
+        "parent_avd": {
+            "data-testid": "restaurant-menu-item"
+        },
+        "name_avd": {
+            "data-testid": "menu-item-name-container"
+        },
+        "price_avd": {
+            "data-testid": "menu-item-price"
+        },
+        "descr_avd": {
+            "data-testid": "description"
+        },
         "id_a": "impressionid",
-        "about_par_avd": {"data-testid": "restaurant-about"},
+        "about_par_avd": {
+            "data-testid": "restaurant-about"
+        },
         "about_par_xp": "//*[@id=\"ghs-restaurant-about\"]",
         "about_par_id": "navSection-about",
-        "name_about_avd": {"data-testid": "restaurantAbout-header"},
-        "rest_cuisines_avd": {"data-testid": "restaurantAbout-cuisines"},
-        "flsch_lnk_avd": {"data-testid": "show-full-schedule-link"},
-        "schdays_avd": {"data-testid": "days"},
-        "schhoursPU_avd": {"data-testid": "pickupHours"},
-        "schhoursD_avd": {"data-testid": "deliveryHours"},
-        "phone_avd": {"data-testid": "restaurant-phone-button"},
+        "name_about_avd": {
+            "data-testid": "restaurantAbout-header"
+        },
+        "rest_cuisines_avd": {
+            "data-testid": "restaurantAbout-cuisines"
+        },
+        "flsch_lnk_avd": {
+            "data-testid": "show-full-schedule-link"
+        },
+        "schdays_avd": {
+            "data-testid": "days"
+        },
+        "schhoursPU_avd": {
+            "data-testid": "pickupHours"
+        },
+        "schhoursD_avd": {
+            "data-testid": "deliveryHours"
+        },
+        "phone_avd": {
+            "data-testid": "restaurant-phone-button"
+        },
         "phone_a": "content",
         "contact_par_cs": "restaurantAbout-info-contact",
-        "map_avd": {"data-testid": "restaurant-about-google-map-link"},
-        "address_avd": {"data-testid": "restaurant-about-address"},
-
+        "map_avd": {
+            "data-testid": "restaurant-about-google-map-link"
+        },
+        "address_avd": {
+            "data-testid": "restaurant-about-address"
+        },
         "notes": {
             "about_par": "parent element containing store info, appears with page load, no scroll necessary; use id for div OR att/value for span",
             "parent": "span containing menu item info",
@@ -47,14 +72,12 @@
             "phone": "button element, string is phone number, formatted; element also has an unformatted int-like value for phone number at attribute 'content'"
         }
     },
-
     "menu_scr_col_hds": {
         "item_id": "id",
         "item_name": "name",
         "item_price": "price",
         "item_descr": "descr"
     },
-
     "det_scr_col_hds": {
         "sch": "full_sched_text",
         "phone": "phone",
@@ -70,34 +93,25 @@
         "store_name": "name",
         "store_url_path": "url_path"
     },
-
     "store_scr_wait_time": 0.08,
     "store_scr_wait_time_1stpg": 1,
     "menu_scr_wait_time": 0.5,
-
     "store_scr_attrs": {
         "button_xp": "//*[@id=\"chiri-modal\"]/div/div/div[1]/a",
         "srch_res_cs": "searchResult",
         "store_id_a": "impressionid",
         "res_footer_xp": "//*[@id=\"ghs-search-results-container\"]/div/div[2]/div/div/span/ghs-search-results/div[2]",
         "url_root": "https://www.grubhub.com/"
-
     },
-
     "store_scr_url": {
         "root": "https://www.grubhub.com/search",
         "next_page_xp": "",
         "params": {
             "lat": "latitude",
             "lng": "longitude",
-            "page_num": "pageNum"            
+            "page_num": "pageNum"
         }
-
     },
-
     "url_verbose": "False",
-
-    "wd_path": "/usr/local/bin/chromedriver_linux64.exe",
-
-    "pts_src_path": "full_area-scanpoints.hexGrid3460m_rad2000m.geojson"
+    "wd_path": "/usr/local/bin/chromedriver_linux64.exe"
 }

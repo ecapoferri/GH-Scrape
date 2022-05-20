@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timedelta
-import logging
+from shapely.geometry import Point
+from urllib.parse import urlencode
 
 # TODO fix except clauses
 
@@ -140,4 +141,43 @@ def str_to_list(the_string: str):
     return the_list
 
 
+def query_url(api_url: str, args: dict, qmark: bool = True) -> str:
+    """Assembles url with api parameters
 
+    Args:
+        api_url (str): api endpoint base url
+            include reused parameters, set qmark to false to omit '?'
+        args (dict): format pairs as <param>: <arg>
+            use with your dynamic param/args
+            use urllib.parse.quote to properly format strings as necessary
+            before passing into this func
+        qmark (bool, optional): Whether to include '?'. Defaults to True.
+
+    Returns:
+        str: full url encoded
+    """
+    q: str = '?' if qmark else ''
+    f_args_str: str = urlencode(args)
+    return f"{api_url}{q}{f_args_str}"
+
+
+def ptstring_topoint(ptstr: str) -> Point:
+    """
+    Args:
+        ptstr (str): string that has been converted from a shapely.geometry Point object
+
+    Raises:
+        Exception: general for any issues
+
+    Returns:
+        Point: shapely.geometry Point object
+    """
+    try:
+        # 'POINT( ' 7 chars; ')' 1 char
+        pS_list = ptstr[7:-1].split(" ")
+        pF_list = [float(s) for s in pS_list]
+        pt = Point(pF_list)
+        return pt
+    except ValueError:
+        raise Exception(f"Something is wrong with the string passed to ptstring_topoint. " +
+                        f"Maybe its not a shapely Point-like string.")

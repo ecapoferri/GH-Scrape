@@ -21,7 +21,7 @@ if 'GHSCRITER' in environ:
 else:
     scrape_iteration: str = paths['scrape_iteration']
 
-prv_store_list_repos = 'gh_scr/gh_rest_scr.01.csv'
+prv_store_list_repos = 'gh_rest_scr.01.csv'
 
 url_root = configs['store_scr_attrs']['url_root']
 
