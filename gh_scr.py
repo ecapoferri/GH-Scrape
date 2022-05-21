@@ -14,20 +14,19 @@ import logging
 from useful_func import ts, jsonextr, query_url
 from loggerhead import add_logger
 
-# start logger as defined in loggerhead, debug to file,
-# adds a common streamhandler, info level to console
-logger = add_logger(__name__)
 
 # TODO change json to .env and use dotenv
 config_args = jsonextr('gh_scr.json')
+logger_name_root = config_args('logger_name_root')
 
+# start logger as defined in loggerhead, debug to file,
+# adds a common streamhandler, info level to console
+logger = add_logger(f"{logger_name_root}.{__name__}")
 
 # read in default values for scrapes:
 # ===================================
 wd_path = config_args['wd_path']
 url_verbose = config_args['url_verbose']
-
-
 
 # VARIABLE shorthands
 # *_avd: <attribute>: <value> Dictionary,
@@ -307,7 +306,6 @@ def scroll_end(wdr: webdriver.Chrome):
 
 def wdriver_quit(wdrv: webdriver.Chrome) -> None:
     """Citizen, give me a selenium.webdriver object. I will quit it for you."""
-
     wdrv.quit()
     logger.info(f"webdriver, session id: {wdrv.session_id} has quit! Have a nice day!")
 

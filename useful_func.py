@@ -5,6 +5,89 @@ from urllib.parse import urlencode
 
 # TODO fix except clauses
 
+def td_string(seconds: float, places: int) -> str:
+    tdstr = str(timedelta(seconds=seconds))
+    parts = tdstr.split('.')
+    print(seconds)
+    if len(parts) > 1:
+        if len(parts[1]) < places: places = len(parts[1])
+    else: parts.append(str(0).zfill(places))
+    return f"{parts[0]}.{parts[1][:places]}"
+
+class Timekeeper:
+    tot_steps: int = None
+    clock_start: float = None
+    step_start: float = None
+    current_step_index: int = None
+    step_finish: float = None
+    step_avg_time: float = None
+    total_elapsed: float = None
+    steps_completed: int = None
+    step_avg_time: float = None
+    est_time_remain: float = None
+    est_finish: datetime = None
+
+    def __init__(self, tot_steps: int, run_start: datetime):
+        self.tot_steps = tot_steps
+        self.clock_start = run_start.timestamp()
+        self.step_start = self.clock_start
+
+    def step_clock_start(self, step_index: int, timenow: datetime):
+        self.step_start = timenow.timestamp()
+        self.step_finish = self.step_start
+        self.current_step_index = step_index
+        return
+
+    def step_clock_stop(self, timenow: datetime):
+        self.step_finish = timenow.timestamp()
+        if self.step_start <= self.clock_start:
+            raise Exception(
+                f"Timekeeper: step_clock_start has not been called. step_clock_start must be called or step_start attribute must be changed.")
+        self.total_elapsed = self.step_finish - self.clock_start
+        self.steps_completed = self.current_step_index + 1
+        self.steps_remaining = self.tot_steps - self.steps_completed
+        self.current_step_time = self.step_finish - self.step_start
+        self.step_avg_time = self.total_elapsed / self.steps_completed
+        self.est_time_remain = self.steps_remaining * self.step_avg_time
+        self.est_finish = datetime.fromtimestamp(self.step_finish + self.est_time_remain)
+        return
+
+    def step_update(self, **new_step_info):
+        """to get different time estimate values if you need a different type of step estimate"""
+
+        if self.step_finish <= self.step_start:
+            raise Exception(
+                f"Timekeeper: step_clock_stop has not been called. step_clock_stop must be called or step_finish attribute must be changed.")
+        if ('new_steps_remaining' in new_step_info) &\
+            ('new_total_steps' in new_step_info) &\
+                ('new_steps_completed' in new_step_info):
+            self.steps_remaining = new_step_info['new_steps_remaining']
+            self.tot_steps = new_step_info['new_total_steps']
+            self.steps_completed = new_step_info['new_steps_completed']
+
+        self.steps_remaining = self.tot_steps - self.steps_completed
+        self.step_avg_time = self.total_elapsed / self.steps_completed
+        self.est_time_remain = self.steps_remaining * self.step_avg_time
+        self.est_finish = datetime.fromtimestamp(self.step_finish + self.est_time_remain)
+    
+    def remain_delta(self, roundto: int) -> str:
+        return td_string(self.est_time_remain, roundto)
+
+    def total_elapse_delta(self, roundto: int) -> str:
+        return td_string(self.total_elapsed, roundto)
+
+    def avg_delta(self, roundto: int) -> str:
+        return td_string(self.step_avg_time, roundto)
+
+    def avg_sec(self, roundto: int) -> float:
+        return round(self.est_time_remain, roundto)
+
+    def finish_time(self) -> datetime:
+        return self.est_finish
+
+    def finish_time_strfmt(self, strftime: str) -> str:
+        return self.est_finish.strftime(strftime)
+
 def timedelta_float_2place(secs: float) -> str:
     return str(timedelta(seconds=secs)).split('.')[0]
 

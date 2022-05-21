@@ -66,7 +66,7 @@ def main():
     for_logger = add_logger(f"{__name__}.for-loop")
     for i, store in enumerate(st_res_df[pickup:].itertuples()):
         loop_id: str = f"{i}:{store.Index}|{store.name}|{store.id}"
-        logging.info(f"\tStore list idx: {loop_id}")
+        for_logger(f"\tStore list idx: {loop_id}")
 
         # start time in sec, initialize finish time incase of error
         i_start = t_sec()
@@ -82,7 +82,7 @@ def main():
             # set finisht time in sec
             i_finish = t_sec()
         except Exception:
-            logger.error(f"There was an exception while scraping")
+            for_logger.error(f"There was an exception while scraping")
             continue
         elapsed = float(i_finish - start)
         i_elapsed = float(i_finish - i_start)
@@ -91,10 +91,9 @@ def main():
                 # add these results to total results
                 rest_det_list.append(this_ser)
                 # wasn't sure if i wanted to tie this to loop index or store
-                logger.info(
-                    f"\tRetieved details for {loop_id}, ~{i_elapsed:.2f} sec.")
+                for_logger.info(f"\tRetieved details for {loop_id}, ~{i_elapsed:.2f} sec.")
         except Exception:
-            logger.error(f"\tReusults not stored for {loop_id}")
+            for_logger.error(f"\tReusults not stored for {loop_id}")
 
         try:
             completed = store.Index - pickup + 1
@@ -105,13 +104,13 @@ def main():
             est_t_elapsed = timedelta_float_2place(round(elapsed, 2))
             finish_at = i_finish + t_remain
             est_finish_at = datetime.fromtimestamp(finish_at).strftime("%m.%d %X")
-            logger.info(
+            for_logger.info(
                 f"\t\tELAPS ~{est_t_elapsed}" +
                 f"\tETRmn ~{est_t_remain}" +
                 f"\tEst. finish: {est_finish_at}"
             )
         except Exception:
-            logger.error(f"Timekeeping error: {loop_id}")        
+            for_logger.error(f"Timekeeping error: {loop_id}")        
 
         # except Exception:
         #     logging.error(f"There was in issue menu scrapping {store.Index}: {store.name}, {store.id}")

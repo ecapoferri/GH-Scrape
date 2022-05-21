@@ -1,4 +1,3 @@
-from logging import getLogger
 from sys import argv
 from gh_scr import rest_menu_scrape_n_scroll, wdriver_start, wdriver_quit
 from gh_scr_headers import\
@@ -8,22 +7,20 @@ from gh_scr_headers import\
     cache_fn,\
     cache_ext,\
     paths,\
-    scrape_iteration
+    scrape_iteration,\
+    logger_name_root
 from useful_func import input_y_no_loopother, timedelta_float_2place, t_sec
 import pandas as pd
 from pandas import DataFrame as Df
 from datetime import datetime
-from loggerhead import std_hdlr, add_logger, log_config, logging
-##Symbol
+from loggerhead import add_logger, wipe_files, add_handlers
+
 # first cmd line arg, where to pick up in the list; defaults to 0
 pickup: int
 if len(argv) >= 2:
     pickup = int(argv[1])
 else: pickup = 0
 
-# whether to reset logs, if true,
-# files at the specified path will be overwritten with '' before logging here,
-# else new log msgs will be appended
 re_file: int = None
 if len(argv) >= 3:
     re_file = int(argv[2])
@@ -34,6 +31,14 @@ debugfpath = \
     f"gh_scr_MENU-DEBUG-{scrape_iteration}" +\
     f"{paths['log_ext']}"
 
+infofpath = \
+    f"{paths['out_dir_main']}" +\
+    f"gh_scr_MENU-CONSOLE-{scrape_iteration}" +\
+    f"{paths['log_ext']}"
+
+# get handlers for logging
+handlers = add_handlers(debugfpath, infofpath)
+
 # reset refile as proper bool
 if re_file: refile: bool = True
 else: refile: bool = False
@@ -41,13 +46,15 @@ else: refile: bool = False
 if not refile:
     re_file = input_y_no_loopother(
         f"Restart Log Files?" +
-        f"\t{debugfpath}" +
-        f"('Yes' will overwrite if these exist, else new log lines are appended) "
-    )
+        f"\t{debugfpath}, {infofpath}" +
+        f"('Yes' will overwrite if these exist, else new log lines are appended) ")
+
+if re_file: wipe_files(debugfpath, infofpath)
+
 # configures main logging
-log_config(path=debugfpath, to_reset=re_file)
 # set up main logger
-logger = add_logger(None)
+logger = add_logger(logger_name_root)
+[logger.addHandler(h) for h in handlers]
 
 # announce oneself
 logger.info(__file__)
@@ -77,7 +84,7 @@ def main():
     for_logger = add_logger(f"{__name__}.for-loop")
     try:
         for i, store in enumerate(st_res_df[pickup:].itertuples()):
-            loop_id: str = f"{i}:{store.Index}|{store.name}|{store.id}"
+            loop_id: str = f"{i}/{list_len}:idx-{store.Index}|{store.name}|{store.id}"
             # time keeping
             i_start = t_sec()
             i_finish = i_start

@@ -25,6 +25,7 @@ prv_store_list_repos = 'gh_rest_scr.01.csv'
 
 url_root = configs['store_scr_attrs']['url_root']
 
+logger_name_root = configs('logger_name_root')
 
 logfpath = \
     f"{paths['out_dir_main']}" +\
@@ -33,7 +34,7 @@ logfpath = \
 
 debugfpath = \
     f"{paths['out_dir_main']}" +\
-    f"gh_scr_DEBUG-{paths['scrape_iteration']}" +\
+    f"gh_scr_DEBUG-{scrape_iteration}" +\
     f"{paths['log_ext']}"
 
 # set up output file path string for scraped list to of stores to scrape

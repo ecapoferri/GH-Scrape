@@ -3,23 +3,18 @@ from gh_scr_headers import\
     debugfpath,\
     configs,\
     paths,\
-    st_list_out_path
+    st_list_out_path,\
+    logger_name_root,\
+    scrape_iteration
 from useful_func import input_y_no_loopother
 import pandas as pd
 from pandas import DataFrame as Df
 import geopandas as gpd
-import logging
-from loggerhead import std_hdlr, add_logger, log_config
+from loggerhead import add_logger, add_handlers, wipe_files
 from gh_scr import gh_store_scrape, wdriver_start, wdriver_quit
 
-# first cmd line arg, where to pick up in the list; defaults to 0
-pickup: int
-if len(argv) >= 2:
-    pickup = int(argv[1])
-else:
-    pickup = 0
+# argv[1] should just be _, left same slices to match other scripts
 
-# whether to reset logs
 re_file: int = None
 if len(argv) >= 3:
     re_file = int(argv[2])
@@ -28,8 +23,16 @@ else:
 
 debugfpath = \
     f"{paths['out_dir_main']}" +\
-    f"gh_scr_STORE-DEBUG-{paths['scrape_iteration']}" +\
+    f"gh_scr_MENU-DEBUG-{scrape_iteration}" +\
     f"{paths['log_ext']}"
+
+infofpath = \
+    f"{paths['out_dir_main']}" +\
+    f"gh_scr_MENU-CONSOLE-{scrape_iteration}" +\
+    f"{paths['log_ext']}"
+
+# get handlers for logging
+handlers = add_handlers(debugfpath, infofpath)
 
 # reset refile as proper bool
 if re_file:
@@ -40,15 +43,17 @@ else:
 if not refile:
     re_file = input_y_no_loopother(
         f"Restart Log Files?" +
-        f"\t{debugfpath}" +
-        f"('Yes' will overwrite if these exist, else new log lines are appended) "
-    )
+        f"\t{debugfpath}, {infofpath}" +
+        f"('Yes' will overwrite if these exist, else new log lines are appended) ")
+
+if re_file:
+    wipe_files(debugfpath, infofpath)
+
 # configures main logging
-log_config(path=debugfpath, to_reset=re_file)
 # set up main logger
-logger = logging.getLogger()
-# adds stream handler, info level
-logger = add_logger('') # adds stream handler, info level
+logger = add_logger(logger_name_root)
+[logger.addHandler(h) for h in handlers]
+
 # announce oneself
 logger.info(__file__)
 

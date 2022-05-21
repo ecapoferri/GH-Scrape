@@ -99,5 +99,7 @@
 
     "wd_path": "/usr/local/bin/chromedriver_linux64.exe",
 
-    "pts_src_path": "full_area-scanpoints.hexGrid3460m_rad2000m.geojson"
+    "pts_src_path": "full_area-scanpoints.hexGrid3460m_rad2000m.geojson",
+
+    "logger_name_root": "gh_scr"
 }
