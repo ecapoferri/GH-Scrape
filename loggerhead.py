@@ -47,5 +47,6 @@ def add_logger(lggr_name: str, *hdlrs) -> logging.Logger:
 
 
 def log_close(lggr: logging.Logger) -> None:
+    [logging.info(f"Logger: {lggr.name}'s handlers will be closed.")]
     [h.close for h in lggr.handlers]
     return

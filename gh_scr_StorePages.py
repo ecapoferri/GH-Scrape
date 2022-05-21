@@ -1,3 +1,4 @@
+from logging import Logger
 import pandas as pd
 from pandas import DataFrame as Df
 from sys import argv
@@ -15,7 +16,7 @@ from gh_scr_headers import\
     logger_name_root,\
     cache_dir, cache_fn, cache_ext
 from useful_func import input_y_no_loopother, Timekeeper
-from loggerhead import add_logger, add_handlers, wipe_files
+from loggerhead import add_logger, add_handlers, wipe_files, log_close
 from datetime import datetime
 now = datetime.now
 
@@ -32,25 +33,28 @@ if len(argv) >= 3:
 else:
     re_file = None
 
-script_choice: str = None
+bad_args_exception = Exception(f"Third arg must be 'menu' OR 'details'")
+choice: str = None
 if len(argv) >= 4:
-    script_choice = str(argv[3])
-else:
-    script_choice = 'details'
+    if (argv[3] in ['menu', 'details']):
+        choice = str(argv[3])
+    else: raise bad_args_exception
+else: raise bad_args_exception
 
-file_caser = {
-    'details': 'DETAILS',
-    'menu': 'MENU'
-}
+# bool tokens for case switches below
+caser = { 'details': (False, True), 'menu': (True, False) }
+m, d =  caser[choice]
 
+# SET UP LOGGING:
+# ===============
 debugfpath = \
     f"{paths['out_dir_main']}" +\
-    f"gh_scr_{file_caser[script_choice]}-DEBUG-{scrape_iteration}" +\
+    f"gh_scr_{choice.upper()}-DEBUG-{scrape_iteration}" +\
     f"{paths['log_ext']}"
 
 infofpath = \
     f"{paths['out_dir_main']}" +\
-    f"gh_scr_{file_caser[script_choice]}-CONSOLE-{scrape_iteration}" +\
+    f"gh_scr_{choice.upper()}-CONSOLE-{scrape_iteration}" +\
     f"{paths['log_ext']}"
 
 # get handlers for logging
@@ -75,139 +79,100 @@ if re_file:
 # set up main logger
 logger = add_logger(logger_name_root)
 [logger.addHandler(h) for h in handlers]
+# ======================================
 
 # announce oneself
-logger.info(__file__)
+logger.info(f"{__file__} ")
 
 
-def details():
+def main():
     list_len = len(st_res_df[pickup:])
 
-    logger.info(f"SCRAPING {list_len} STORES FOR DETAILS")
+    logger.info(f"SCRAPING {list_len} STORES")
 
     thisdriver = wdriver_start(True)
 
     # read in list of store
     st_res_df = pd.read_csv(prv_store_list_repos)
 
-    # initialize empty dataframe for full list of menu items
-    rest_det_list = []
+    # PRE-INITIALIZE OBJECTS FOR COUNTING/STORING:
+    # ============================================
+    # total results counter for menues
+    if m: total_res: int = 0
+    # initialize empty list to which series will be appended for details
+    if d: rest_det_list = []
+
+    # START TIMEKEEPING
+    # =================
     tk = Timekeeper(len(st_res_df.index), now())
 
-    for_logger = add_logger(f"{logger_name_root}.for-loop")
-    for i, store in enumerate(st_res_df[pickup:].itertuples()):
-        loop_id: str = f"{i}:{store.Index}|{store.name}|{store.id}"
-        for_logger(f"\tStore list idx: {loop_id}")
+    # ANNOUNCE FUNCTION STARTUP:
+    # ==========================
+    logger.info(
+        f"{choice.upper()} SCRAPING {len(st_res_df[pickup:])} STORES"
+    )
 
-        # start time loop time
-        tk.step_clock_start(i, now())
-
-        try:
-            # try:
-
-            url = f"{url_root}{store.url_path}"
-
-            # use fn in core module to scrape details from store page on gh
-            this_ser = rest_details_scrape(
-                url, store.id, store.name, thisdriver)
-        except Exception:
-            for_logger.error(f"There was an exception while scraping")
-            continue
-
-        try:
-            if this_ser.dtypes:
-                # add these results to total results
-                rest_det_list.append(this_ser)
-                # wasn't sure if i wanted to tie this to loop index or store
-        except Exception:
-            for_logger.error(f"\tReusults not stored for {loop_id}")
-
-        try:
-            tk.step_clock_stop(now())
-            est_t_remain = tk.remain_delta(2)
-            est_t_elapsed = tk.total_elapse_delta(2)
-            est_finish_at = tk.finish_time_strfmt(f"%m.%d %X")
-            for_logger.info(
-                f"\tRetieved details for {loop_id}, ~{tk.current_step_time:.2f} sec.")
-            for_logger.info(
-                f"\t\tELAPS ~{est_t_elapsed}" +
-                f"\tETRmn ~{est_t_remain}" +
-                f"\tEst. finish: {est_finish_at}"
-            )
-        except Exception:
-            for_logger.error(f"Timekeeping error: {loop_id}")
-
-        # except Exception:
-        #     logging.error(f"There was in issue menu scrapping {store.Index}: {store.name}, {store.id}")
-
-    logger.info(f"***DETAILS FOR {len(rest_det_list)} RETRIEVED")
-
-    Df(rest_det_list).to_csv(det_out_path)
-
-    wdriver_quit(thisdriver)
-    del thisdriver
-    return
-
-
-def menu():
-    # total results counter
-    total_res: int = 0
-    
-    st_res_df = pd.read_csv(prv_store_list_repos)
-
-    list_len = len(st_res_df[pickup:])
-
-    thisdriver = wdriver_start(True)
-
-    url_root = configs['store_scr_attrs']['url_root']
-
-    # initialize empty dataframe for full list of menu items
-
-    logger.info(f"SCRAPING {len(st_res_df[pickup:])} MENUES")
-    tk = Timekeeper(len(st_res_df.index), now())
-
-    # loop through all stores in list, starting at 'pickup' index,
-    # loop get's it's own logger to id problems there
-    # for_logger = logging.getLogger(f"<root name>.list_loop") # stream handler added in fn
-    # for_logger.addHandler(std_hdlr)
-    for_logger = add_logger(f"{logger_name_root}.for-loop")
+    # THE LOOP
+    # ========
     try:
+        # SEPARATE NAMED LOGGER FOR THE FOR LOOP:
+        for_logger: Logger = add_logger(f"{logger_name_root}.for-loop")
+
         for i, store in enumerate(st_res_df[pickup:].itertuples()):
-            loop_id: str = f"{i}/{list_len}:idx-{store.Index}|{store.name}|{store.id}"
+            loop_id: str = f"{i}:{store.Index}|{store.name}|{store.id}"
+            for_logger(f"\tStore list idx: {loop_id}")
 
             # initialize empty data frame for results of this loop iter
-            this_df = Df()
+            if m: this_df = Df()        
             
             for_logger.info(f"\tStore list idx: {loop_id}")
-            # time keeping
-            tk.step_clock_start(i, now())
-            try:
 
+            # start time loop time
+            tk.step_clock_start(i, now())
+
+            # SCRAPE PAGE RESULTS:
+            # ====================
+            try:
                 url = f"{url_root}{store.url_path}"
 
-                this_df = rest_menu_scrape_n_scroll(url, store.id, thisdriver)
+                # use fn in core module to scrape details from store page on gh
+                if d: this_ser = rest_details_scrape(url, store.id, store.name, thisdriver)
+                if m: this_df = rest_menu_scrape_n_scroll(url, store.id, thisdriver)
 
-                for_logger.info(f"\t\tResults in this menu added to table: {len(this_df.index)}")
             except Exception:
-                for_logger.error(f"There was an exceptionn while menu scrapping: {loop_id}")
+                for_logger.error(f"There was an exception while scraping")
                 continue
 
-            try:
-                if len(this_df.index):
-                    # write to indiv csv
-                    this_df.to_csv(f"{cache_dir}{cache_fn}{store.id}{cache_ext}")
-                    total_res += len(this_df.index)
-                    for_logger.info(f"\t\tTotal Results now: {total_res}")
-            except Exception:
-                for_logger.error(f"There was an exception while writing to csv: {loop_id}")
+            # RECORD STORE PAGE RESULTS:
+            # ==========================
+            # OUTPUT CSV FOR MENU SCRAPE, APPEND TO LIST OF SERIES FOR DETAILS SCRAPE
+            if m:
+                try:
+                    if len(this_df.index):
+                        # write to indiv csv
+                        this_df.to_csv(f"{cache_dir}{cache_fn}{store.id}{cache_ext}")
+                        total_res += len(this_df.index)
+                        for_logger.info(f"\t\tTotal Results now: {total_res}")
+                except Exception:
+                    for_logger.error(f"There was an exception while writing to csv: {loop_id}")
 
+            if d:
+                try:
+                    if this_ser.dtypes:
+                        rest_det_list.append(this_ser)
+                except Exception:
+                    for_logger.error(f"\tNo results not stored for {loop_id}")
+            # ================================================================
+
+            # TIMEKEEPING WRAP-UP: (SAME FOR BOTH)
+            # ====================================
             try:
                 tk.step_clock_stop(now())
                 est_t_remain = tk.remain_delta(2)
                 est_t_elapsed = tk.total_elapse_delta(2)
                 est_finish_at = tk.finish_time_strfmt(f"%m.%d %X")
                 for_logger.info(
-                    f"\tRetieved details for {loop_id}, ~{tk.current_step_time:.2f} sec.")
+                    f"\tRetieved page details for {loop_id}, ~{tk.current_step_time:.2f} sec.")
                 for_logger.info(
                     f"\t\tELAPS ~{est_t_elapsed}" +
                     f"\tETRmn ~{est_t_remain}" +
@@ -215,18 +180,26 @@ def menu():
                 )
             except Exception:
                 for_logger.error(f"Timekeeping error: {loop_id}")
+        # END LOOP
+        # ========
+
+        # OUTPUT DETAILS TO CSV: (DETAILS ONLY)
+        if d:
+            try:
+                Df(rest_det_list).to_csv(det_out_path)
+            except Exception:
+                logger.error(f"There was an exception while writing full details results to {det_out_path}")
+    
+    # WRAP IT UP B! (same for both)
+    # =============================
     finally:
-        if len(this_df.index) != 0:
-            for_logger.info(f"\t\tRetrieved Menu Items: {len(this_df.index)}, ~{tk.current_step_time:.2f}, sec.")        
         wdriver_quit(thisdriver)
         del thisdriver
+        logger.info(f"***{len(rest_det_list)} PAGE DETAILS RETRIEVED***")
         return
 
 
-fn_caser = {
-    'details': details,
-    'menu': menu
-}
-
 if __name__ == '__main__':
-    fn_caser[script_choice]()
+    main()
+    log_close(logger)
+    
