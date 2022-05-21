@@ -88,17 +88,10 @@ class Timekeeper:
     def finish_time_strfmt(self, strftime: str) -> str:
         return self.est_finish.strftime(strftime)
 
-def timedelta_float_2place(secs: float) -> str:
-    return str(timedelta(seconds=secs)).split('.')[0]
-
 
 def ts() -> str:
     """Quick Timestamp: mm.dd-hh.mm.ss"""
     return datetime.now().strftime('%m.%d-%H.%M.%S')
-
-
-def t_sec() -> float:
-    return float(datetime.now().timestamp())
 
 
 def jsonextr(filename: str) -> dict:
