@@ -7,7 +7,7 @@ used to set up common logging for scripts and modules in this proect
 debug_fmt = f"%(asctime)s >> %(name)s [%(module)s.%(funcName)s] >>\n\t%(levelname)s: %(message)s"
 debug_datefmt = f'%m.%d-%H:%M:%S'
 info_fmt = f"%(asctime)s >> %(message)s"
-strm_fmt = f"%(levelname)s:\t%(message)s"
+strm_fmt = f"%(name)s\t%(levelname)s:\t%(message)s"
 strm_datefmt = f"%H:%M:%S"
 
 debug_fmtter = logging.Formatter(fmt=debug_fmt, datefmt=debug_datefmt)

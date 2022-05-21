@@ -34,7 +34,7 @@ else:
 
 script_choice: str = None
 if len(argv) >= 4:
-    script_choice = int(argv[3])
+    script_choice = str(argv[3])
 else:
     script_choice = 'details'
 
@@ -163,7 +163,7 @@ def menu():
 
     # initialize empty dataframe for full list of menu items
 
-    logger.info(f"SCRAPING {len(st_res_df[pickup:])} MENUES FOR DETAILS")
+    logger.info(f"SCRAPING {len(st_res_df[pickup:])} MENUES")
     tk = Timekeeper(len(st_res_df.index), now())
 
     # loop through all stores in list, starting at 'pickup' index,

@@ -8,7 +8,6 @@ from urllib.parse import urlencode
 def td_string(seconds: float, places: int) -> str:
     tdstr = str(timedelta(seconds=seconds))
     parts = tdstr.split('.')
-    print(seconds)
     if len(parts) > 1:
         if len(parts[1]) < places: places = len(parts[1])
     else: parts.append(str(0).zfill(places))

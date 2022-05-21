@@ -25,44 +25,34 @@ prv_store_list_repos = 'gh_rest_scr.01.csv'
 
 url_root = configs['store_scr_attrs']['url_root']
 
-logger_name_root = configs('logger_name_root')
-
-logfpath = \
-    f"{paths['out_dir_main']}" +\
-    f"gh_scr_LOG-{paths['scrape_iteration']}" +\
-    f"{paths['log_ext']}"
-
-debugfpath = \
-    f"{paths['out_dir_main']}" +\
-    f"gh_scr_DEBUG-{scrape_iteration}" +\
-    f"{paths['log_ext']}"
+logger_name_root = configs['logger_name_root']
 
 # set up output file path string for scraped list to of stores to scrape
 st_list_out_path: str = \
     paths['out_dir_main'] +\
     paths['store_scr'] +\
-    paths['scrape_iteration'] +\
+    scrape_iteration +\
     paths['table_ext']
 
 # set up output file path string for menu scrape
 menu_out_path: str = \
     paths['out_dir_main'] +\
     paths['menu_scr'] +\
-    paths['scrape_iteration'] +\
+    scrape_iteration +\
     paths['table_ext']
 
 # set up output file path string for menu scrape
 det_out_path: str = \
     paths['out_dir_main'] +\
     paths['det_scr'] +\
-    paths['scrape_iteration'] +\
+    scrape_iteration +\
     paths['table_ext']
 
 # set up output name string components to baqck up each scraped menu
 # path for backup cacheection
 cache_dir = \
     paths['out_dir_main']+\
-    paths['scrape_iteration']+\
+    scrape_iteration +\
     paths['out_dir_collection_sub']
 # ouptput filename string for backup csvs, a path, index and file ext will be added in func/loop
 cache_fn = \

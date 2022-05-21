@@ -17,7 +17,7 @@ from loggerhead import add_logger
 
 # TODO change json to .env and use dotenv
 config_args = jsonextr('gh_scr.json')
-logger_name_root = config_args('logger_name_root')
+logger_name_root = config_args['logger_name_root']
 
 # start logger as defined in loggerhead, debug to file,
 # adds a common streamhandler, info level to console
