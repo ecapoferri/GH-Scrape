@@ -3,10 +3,10 @@
 # env var for scrape iteration index for dir and file names
 export GHSCRITER=$4
 # create cache directory if it doesn't exist
-# python seems to have issues creating directories implicitly 
+# python seems to have issues creating directories implicitly sometimes?
 if [ ! -d OUTPUT/$4-menu_cache &> /dev/null ]; then
     mkdir OUTPUT/$4-menu_cache
 fi
 # executes command within xvfb, appending (in case they have already been started)
 # stderr/out to error log file
-xvfb-run pythonsh gh_scr_StorePages.py $1 $2 $3 2> OUTPUT/gh_scr_$3-ERROR-$4.log
+xvfb-run pythonsh gh_scr_StorePages.py $1 $2 $3 2> OUTPUT/gh_scr_${3^^}ERROR-$4.log

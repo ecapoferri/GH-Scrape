@@ -1,25 +1,20 @@
-from logging import Logger
 import pandas as pd
 from pandas import DataFrame as Df
 from sys import argv
 from gh_scr import\
-    wdriver_start,\
-    wdriver_quit,\
-    rest_menu_scrape_n_scroll,\
+    wdriver_start, wdriver_quit, rest_menu_scrape_n_scroll,\
     rest_details_scrape
 from gh_scr_headers import\
-    url_root,\
-    prv_store_list_repos,\
-    det_out_path,\
-    paths, configs,\
-    scrape_iteration,\
-    logger_name_root,\
-    cache_dir, cache_fn, cache_ext
+    url_root, prv_store_list_repos, det_out_path, paths,\
+    scrape_iteration, logger_name_root, cache_dir, cache_fn, cache_ext
 from useful_func import input_y_no_loopother, Timekeeper
 from loggerhead import add_logger, add_handlers, wipe_files, log_close
+from logging import Logger
 from datetime import datetime
 now = datetime.now
 
+# LOAD UP CMD LINE ARGS:
+# ======================
 # first cmd line arg, where to pick up in the list; defaults to 0
 pickup: int
 if len(argv) >= 2:
@@ -36,14 +31,18 @@ else:
 bad_args_exception = Exception(f"Third arg must be 'menu' OR 'details'")
 choice: str = None
 if len(argv) >= 4:
-    if (argv[3] in ['menu', 'details']):
+    if (argv[3] in ['menu', 'details', 'both']):
         choice = str(argv[3])
     else: raise bad_args_exception
 else: raise bad_args_exception
+# ============================
 
+# SET BOOLEANS FOR CASE (MENU OR DETAILS)
+# =======================================
 # bool tokens for case switches below
-caser = { 'details': (False, True), 'menu': (True, False) }
+caser = { 'details': (False, True), 'menu': (True, False), 'both': (True, True) }
 m, d =  caser[choice]
+# ===================
 
 # SET UP LOGGING:
 # ===============
@@ -56,10 +55,8 @@ infofpath = \
     f"{paths['out_dir_main']}" +\
     f"gh_scr_{choice.upper()}-CONSOLE-{scrape_iteration}" +\
     f"{paths['log_ext']}"
-
 # get handlers for logging
 handlers = add_handlers(debugfpath, infofpath)
-
 # reset refile as proper bool
 if re_file:
     refile: bool = True
@@ -71,10 +68,8 @@ if not refile:
         f"Restart Log Files?" +
         f"\t{debugfpath}, {infofpath}" +
         f"('Yes' will overwrite if these exist, else new log lines are appended) ")
-
 if re_file:
     wipe_files(debugfpath, infofpath)
-
 # configures main logging
 # set up main logger
 logger = add_logger(logger_name_root)
