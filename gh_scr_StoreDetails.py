@@ -1,12 +1,18 @@
+from sys import argv
 from gh_scr import wdriver_start, wdriver_quit, rest_details_scrape
-from gh_scr_headers import url_root, prv_store_list_repos, det_out_path, paths, scrape_iteration, logger_name_root
+from gh_scr_headers import\
+    url_root,\
+    prv_store_list_repos,\
+    det_out_path,\
+    paths,\
+    scrape_iteration,\
+    logger_name_root
 from useful_func import input_y_no_loopother, Timekeeper
 from loggerhead import add_logger, add_handlers, wipe_files
 from datetime import datetime
 now = datetime.now
 import pandas as pd
 from pandas import DataFrame as Df
-from sys import argv
 
 # first cmd line arg, where to pick up in the list; defaults to 0
 pickup: int

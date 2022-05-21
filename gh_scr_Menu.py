@@ -61,7 +61,7 @@ logger = add_logger(logger_name_root)
 logger.info(__file__)
 
 
-def main():
+def menu():
     # total results counter
     total_res: int = 0
     
@@ -135,5 +135,5 @@ def main():
         return
 
 if __name__ == '__main__':
-    main()
+    menu()
         
