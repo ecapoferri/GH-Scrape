@@ -114,7 +114,7 @@ def main():
         for_logger: Logger = add_logger(f"{logger_name_root}.for-loop")
 
         for i, store in enumerate(st_res_df[pickup:].itertuples()):
-            loop_id: str = f"{i}:{store.Index}|{store.name}|{store.id}"
+            loop_id: str = f"{i}:{i+1}/{list_len}:{store.Index}|{store.name}|{store.id}"
             for_logger(f"\tStore list idx: {loop_id}")
 
             # initialize empty data frame for results of this loop iter
