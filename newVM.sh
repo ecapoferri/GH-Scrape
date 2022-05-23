@@ -19,10 +19,10 @@ sudo timedatectl set-timezone America/Chicago
 mkdir dev && mkdir dev/python;
 
 sudo apt update -y && sudo apt upgrade -y && sudo apt install -y\
-    wget\
-    xvfb\
-    ssh\
-    git;
+	wget\
+	xvfb\
+	ssh\
+	git;
 
 sudo apt update -y && sudo apt upgrade -y;
 
@@ -31,9 +31,9 @@ wget "$chr_path$chr_fn" && sudo apt install -y "./$chr_fn" && rm -rf "./$chr_fn"
 
 # <chromedriver url/><same as chromedriver executable minus '.zip'>
 wget "$chrdr_path$chrdr_fn.zip" && \
-    gzip -d -S .zip "$chrdr_fn.zip" && \
-    chmod +x "$chrdr_fn" && \
-    mv "$chrdr_fn" "dev/$chrdr_fn.exe"; # exe to match path on local pc
+	gzip -d -S .zip "$chrdr_fn.zip" && \
+	chmod +x "$chrdr_fn" && \
+	mv "$chrdr_fn" "dev/$chrdr_fn.exe"; # exe to match path on local pc
 
 wget "$mcnd_path$mcnd_fn" # <miniconda url/><same as miniconda script>
 chmod +x "$mcnd_fn"
@@ -46,14 +46,14 @@ conda update -y --all
 conda create -y --name "$mc_env"
 conda activate -y --name  "$mc_env"
 conda install -y -n "$mc_env" -c conda-forge\
-    geopandas\
-    autopep8\
-    pip\
-    selenium\
-    jupyter\
-    fastapi\
-    requests\
-    uvicorn\
+	geopandas\
+	autopep8\
+	pip\
+	selenium\
+	jupyter\
+	fastapi\
+	requests\
+	uvicorn\
 
 
 conda upgrade -y -n "$mc_env" -c conda-forge --all
