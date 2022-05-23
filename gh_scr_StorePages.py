@@ -1,3 +1,4 @@
+import traceback
 import pandas as pd
 from pandas import DataFrame as Df
 from sys import argv
@@ -28,7 +29,7 @@ if len(argv) >= 3:
 else:
 	re_file = None
 
-bad_args_exception = Exception(f"Third arg must be 'menu' OR 'details'")
+bad_args_exception = ValueError(f"Third arg must be 'menu' OR 'details'")
 choice: str = None
 if len(argv) >= 4:
 	if (argv[3] in ['menu', 'details', 'both']):
@@ -136,6 +137,7 @@ def main():
 
 			except Exception:
 				for_logger.error(f"There was an exception while scraping")
+				for_logger.debug(traceback.format_exc())
 				continue
 
 			# RECORD STORE PAGE RESULTS:
@@ -150,6 +152,7 @@ def main():
 						for_logger.info(f"\t\tTotal Results now: {total_res}")
 				except Exception:
 					for_logger.error(f"There was an exception while writing to csv: {loop_id}")
+					for_logger.debug(traceback.format_exc())
 
 			if d:
 				try:
@@ -157,6 +160,7 @@ def main():
 						rest_det_list.append(this_ser)
 				except Exception:
 					for_logger.error(f"\tNo results not stored for {loop_id}")
+					for_logger.debug(traceback.format_exc())
 			# ================================================================
 
 			# TIMEKEEPING WRAP-UP: (SAME FOR BOTH)
@@ -175,6 +179,7 @@ def main():
 				)
 			except Exception:
 				for_logger.error(f"Timekeeping error: {loop_id}")
+				for_logger.debug(traceback.format_exc())
 		# END LOOP
 		# ========
 
@@ -183,7 +188,9 @@ def main():
 			try:
 				Df(rest_det_list).to_csv(det_out_path)
 			except Exception:
-				logger.error(f"There was an exception while writing full details results to {det_out_path}")
+				logger.error(
+					f"There was an exception while writing full details results to {det_out_path}")
+				logger.debug(traceback.format_exc())
 	
 	# WRAP IT UP B! (same for both)
 	# =============================

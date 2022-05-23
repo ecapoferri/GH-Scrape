@@ -11,7 +11,7 @@ try:
 
 	@app.get("/")
 	async def root():
-		return {"message": "Hello World"}
+		return {"message": "Hello, GooGoo"}
 
 	@app.get("/scrape-console")
 	async def scrape_console():

@@ -12,6 +12,7 @@ from pandas import DataFrame as Df
 import geopandas as gpd
 from loggerhead import add_logger, add_handlers, wipe_files
 from gh_scr import gh_store_scrape, wdriver_start, wdriver_quit
+import traceback
 
 # argv[1] should just be _, left same slices to match other scripts
 
@@ -94,8 +95,10 @@ def main():
 	except KeyboardInterrupt:
 		logger.error(
 			f"KeyboardInterrupt detected, bye-bye...")
+		logger.debug(traceback.format_exc())
 	except Exception:
 		logger.error(f"An exceptionn occurred...")
+		logger.debug(traceback.format_exc())
 	finally:
 		st_res_df.to_csv(st_list_out_path)
 		logger.info(f"EXPORTED - {st_list_out_path}")
