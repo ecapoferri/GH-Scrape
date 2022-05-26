@@ -9,4 +9,4 @@ if [ ! -d OUTPUT/$4-menu_cache &> /dev/null ]; then
 fi
 # executes command within xvfb, appending (in case they have already been started)
 # stderr/out to error log file
-xvfb-run pythonsh gh_scr_StorePages.py $1 $2 $3 2> OUTPUT/gh_scr_${3^^}ERROR-$4.log
+xvfb-run pythonsh gh_scr_StorePages.py $1 $2 $3 > OUTPUT/gh_scr_${3^^}ERROR-$4.log 2>&1

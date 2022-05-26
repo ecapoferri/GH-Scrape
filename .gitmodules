@@ -1,0 +1,3 @@
+[submodule "useful_fns"]
+	path = useful_fns
+	url = https://github.com/ecapoferri/useful_fns
