@@ -11,7 +11,7 @@ from time import sleep
 import pandas as pd
 from pandas import DataFrame as Df, Series as Ser
 import logging
-from useful_func import ts, jsonextr, query_url
+from useful_fns.fns import ts, jsonextr, query_url
 from loggerhead import add_logger
 import traceback
 

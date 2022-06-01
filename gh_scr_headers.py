@@ -1,4 +1,4 @@
-from useful_func import jsonextr
+from useful_fns.fns import jsonextr
 from os import environ
 
 """

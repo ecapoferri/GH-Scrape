@@ -6,7 +6,7 @@ from gh_scr_headers import\
 	st_list_out_path,\
 	logger_name_root,\
 	scrape_iteration
-from useful_func import input_y_no_loopother
+from useful_fns.fns import input_y_no_loopother
 import pandas as pd
 from pandas import DataFrame as Df
 import geopandas as gpd

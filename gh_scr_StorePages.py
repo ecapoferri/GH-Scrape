@@ -8,7 +8,7 @@ from gh_scr import\
 from gh_scr_headers import\
 	url_root, prv_store_list_repos, det_out_path, paths,\
 	scrape_iteration, logger_name_root, cache_dir, cache_fn, cache_ext
-from useful_func import input_y_no_loopother, Timekeeper
+from useful_fns.fns import input_y_no_loopother, Timekeeper
 from loggerhead import add_logger, add_handlers, wipe_files, log_close
 from logging import Logger
 from datetime import datetime
