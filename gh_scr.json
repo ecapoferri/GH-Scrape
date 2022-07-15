@@ -13,7 +13,6 @@
 
 	"menu_scr_attrs": {
 		"button_txt": "Dismiss",
-		
 		"parent_avd": {"data-testid": "restaurant-menu-item"},
 		"name_avd": {"data-testid": "menu-item-name-container"},
 		"price_avd": {"data-testid": "menu-item-price"},
@@ -21,7 +20,7 @@
 		"id_a": "impressionid",
 		"about_par_avd": {"data-testid": "restaurant-about"},
 		"about_par_xp": "//*[@id=\"ghs-restaurant-about\"]",
-		"about_par_id": "navSection-about",
+		"about_par_id": "ghs-restaurant-about",
 		"name_about_avd": {"data-testid": "restaurantAbout-header"},
 		"rest_cuisines_avd": {"data-testid": "restaurantAbout-cuisines"},
 		"flsch_lnk_avd": {"data-testid": "show-full-schedule-link"},
@@ -71,9 +70,9 @@
 		"store_url_path": "url_path"
 	},
 
-	"store_scr_wait_time": 0.08,
+	"store_scr_wait_time": 0.01,
 	"store_scr_wait_time_1stpg": 1,
-	"menu_scr_wait_time": 0.5,
+	"menu_scr_wait_time": 1,
 
 	"store_scr_attrs": {
 		"button_xp": "//*[@id=\"chiri-modal\"]/div/div/div[1]/a",
@@ -97,7 +96,7 @@
 
 	"url_verbose": "False",
 
-	"wd_path": "/usr/local/bin/chromedriver_linux64.exe",
+	"wd_path": "../../chromedriver101.exe",
 
 	"pts_src_path": "full_area-scanpoints.hexGrid3460m_rad2000m.geojson",
 

@@ -82,6 +82,7 @@ logger.info(f"{__file__} ")
 
 
 def main():
+	st_res_df = pd.read_csv(prv_store_list_repos)
 	list_len = len(st_res_df[pickup:])
 
 	logger.info(f"SCRAPING {list_len} STORES")
@@ -89,7 +90,6 @@ def main():
 	thisdriver = wdriver_start(True)
 
 	# read in list of store
-	st_res_df = pd.read_csv(prv_store_list_repos)
 
 	# PRE-INITIALIZE OBJECTS FOR COUNTING/STORING:
 	# ============================================
@@ -112,11 +112,11 @@ def main():
 	# ========
 	try:
 		# SEPARATE NAMED LOGGER FOR THE FOR LOOP:
-		for_logger: Logger = add_logger(f"{logger_name_root}.for-loop")
+		for_logger = add_logger(f"{logger_name_root}.for-loop")
 
 		for i, store in enumerate(st_res_df[pickup:].itertuples()):
-			loop_id: str = f"{i}:{i+1}/{list_len}:{store.Index}|{store.name}|{store.id}"
-			for_logger(f"\tStore list idx: {loop_id}")
+			loop_id: str = f"{i}:{i+1}/{list_len};{store.Index}|{store.name}|{store.id}"
+			for_logger.info(f"\tStore list idx: {loop_id}")
 
 			# initialize empty data frame for results of this loop iter
 			if m: this_df = Df()		
@@ -136,8 +136,8 @@ def main():
 				if m: this_df = rest_menu_scrape_n_scroll(url, store.id, thisdriver)
 
 			except Exception:
-				for_logger.error(f"There was an exception while scraping")
 				for_logger.debug(traceback.format_exc())
+				for_logger.error(f"There was an exception while scraping")
 				continue
 
 			# RECORD STORE PAGE RESULTS:
@@ -151,18 +151,24 @@ def main():
 						total_res += len(this_df.index)
 						for_logger.info(f"\t\tTotal Results now: {total_res}")
 				except Exception:
-					for_logger.error(f"There was an exception while writing to csv: {loop_id}")
 					for_logger.debug(traceback.format_exc())
+					for_logger.error(f"There was an exception while writing to csv: {loop_id}")
 
 			if d:
 				try:
-					if this_ser.dtypes:
+					if len(this_ser):
 						rest_det_list.append(this_ser)
 				except Exception:
-					for_logger.error(f"\tNo results not stored for {loop_id}")
 					for_logger.debug(traceback.format_exc())
+					for_logger.error(f"\tNo results stored for {loop_id}")
 			# ================================================================
-
+			if d:
+				try:
+					Df(rest_det_list).to_csv(det_out_path)
+				except Exception:
+					logger.debug(traceback.format_exc())
+					logger.error(
+						f"There was an exception while writing full details results to {det_out_path}")
 			# TIMEKEEPING WRAP-UP: (SAME FOR BOTH)
 			# ====================================
 			try:
@@ -178,19 +184,19 @@ def main():
 					f"\tEst. finish: {est_finish_at}"
 				)
 			except Exception:
-				for_logger.error(f"Timekeeping error: {loop_id}")
 				for_logger.debug(traceback.format_exc())
+				for_logger.error(f"Timekeeping error: {loop_id}")
+			# OUTPUT DETAILS TO CSV: (DETAILS ONLY)
+
 		# END LOOP
 		# ========
 
-		# OUTPUT DETAILS TO CSV: (DETAILS ONLY)
-		if d:
-			try:
-				Df(rest_det_list).to_csv(det_out_path)
-			except Exception:
-				logger.error(
-					f"There was an exception while writing full details results to {det_out_path}")
-				logger.debug(traceback.format_exc())
+
+
+	except Exception:
+		logger.debug(traceback.format_exc())
+		logger.error(
+			f"Loop error")
 	
 	# WRAP IT UP B! (same for both)
 	# =============================

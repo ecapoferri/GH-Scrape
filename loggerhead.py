@@ -37,10 +37,7 @@ def add_handlers(debug_f_path, info_f_path):
 	return debug_hdlr, info_hdlr, std_hdlr
 
 def add_logger(lggr_name: str, *hdlrs) -> logging.Logger:
-	"""
-	Returns a logging.Logger with an ERROR level streamhandler,
-	an INFO level filehandler, and a DEBUG level filehandler
-	"""
+
 	lggr = logging.getLogger(lggr_name)
 	lggr.setLevel(logging.DEBUG)
 	return lggr
